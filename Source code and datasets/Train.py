@@ -138,8 +138,8 @@ def test(model, device, test_loader):
 
 
 
-num_classes = 5
-model = UNet(6, 5).to(device)
+num_classes = 7
+model = RCNet(21, 7).to(device)
 momentum = 0.9
 betas = (0.9, 0.999)
 num_epochs = 200
