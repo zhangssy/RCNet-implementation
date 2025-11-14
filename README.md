@@ -1,4 +1,4 @@
-# PaAt-ViT-Implementation
+# RCNet-Implementation
 Source code for "Land cover classification via circular polarimetric feature representation integrated with the Physics-aware Attention Visual Transformer (PaAt-ViT)" in **International Journal of Applied Earth Observation and Geoinformation**
 
 The paper can be accessed through：*
