@@ -20,8 +20,8 @@ def addZeroPadding(X, margin=2):#
     newX[margin:X.shape[0] + margin, margin:X.shape[1] + margin, :] = X
     return newX
 """# **2.Dataloader**"""
-windowSize =11
-num_classes=5
+windowSize =7
+num_classes=7
 model=RCNet().eval().cuda()
 model.load_state_dict(torch.load('model path'))
 print('model loaded!')
