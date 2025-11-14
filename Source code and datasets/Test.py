@@ -8,7 +8,7 @@ import torch.optim as optim
 from scipy.io import loadmat, savemat
 import h5py
 from time import *
-from PaAt-ViT import *
+from RCNet import *
 begin_time = time()
 """# **1.Data processing**"""
 def addZeroPadding(X, margin=2):#
@@ -22,7 +22,7 @@ def addZeroPadding(X, margin=2):#
 """# **2.Dataloader**"""
 windowSize =11
 num_classes=5
-model=CSEAViT().eval().cuda()
+model=RCNet().eval().cuda()
 model.load_state_dict(torch.load('model path'))
 print('model loaded!')
 """# **3.visiualization**"""
