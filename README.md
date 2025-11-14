@@ -4,7 +4,7 @@ The paper can be accessed through：*
 
 ![image](https://github.com/zhangssy/RCNet-implementation/blob/main/Source%20code%20and%20datasets/flowchart.png)
 
-# Datasets:
+# Datasets
 Tthree benchmark PolSAR datasets were utilized to assess the performance of the proposed method in this study. Oberpfaffenhofen, San Francisco and Barnaul.
 These datasets are provided in this repository. 
 # Experimental Configuration
