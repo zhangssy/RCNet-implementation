@@ -5,20 +5,18 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
-from PaAt-ViT import *
+from RCNet import *
 
 
-plt.rcParams["font.family"] = ["SimHei", "WenQuanYi Micro Hei", "Heiti TC"]
-plt.rcParams["axes.unicode_minus"] = False  
 
 batch_size = 32
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# path of datasets
-train_txt_path = os.path.join("train_txt_path", "Train.txt")
+
+train_txt_path = os.path.join("train_txt_path ", "Train.txt")
 test_txt_path = os.path.join("test_txt_path", "Test.txt")
-# learning accuracy curve
-save_path = "accuracy_curve_path.png"
+
+save_path = "accuracy_curve_2.png"
 
 
 class MyDataset(Dataset):
@@ -38,7 +36,6 @@ class MyDataset(Dataset):
         return len(self.imgs)
 
 
-# 构建数据集和数据加载器
 train_data = MyDataset(txt_path=train_txt_path)
 test_data = MyDataset(txt_path=test_txt_path)
 train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True, num_workers=0)
@@ -65,11 +62,11 @@ def train(model, device, train_loader, optimizer, epoch):
     count = 0
 
     for i, (inputs_1, labels) in enumerate(train_loader):
-      
-        traininputs0 = torch.rand(1, 12, 11, 11).to(device)
+
+        traininputs0 = torch.rand(1, 21,7, 7).to(device)
         traininputs = traininputs0
 
-    
+   
         for j in range(len(inputs_1)):
             inputs_2 = torch.load(inputs_1[j]).cuda()
             traininputs = torch.cat((traininputs, inputs_2), 0).cuda()
@@ -77,7 +74,7 @@ def train(model, device, train_loader, optimizer, epoch):
         traininputs4 = del_tensor_ele(traininputs, 0).cuda()
         del traininputs
 
-        
+
         optimizer.zero_grad()
         outputs = model(traininputs4).cuda()
         loss = calc_loss(outputs, labels, device).cuda()
@@ -85,7 +82,7 @@ def train(model, device, train_loader, optimizer, epoch):
         optimizer.step()
         total_loss += loss.item()
 
-        # 计算训练精度
+
         outputs = np.argmax(outputs.detach().cpu().numpy(), axis=1)
         if count == 0:
             y_pred_test = outputs
@@ -95,10 +92,10 @@ def train(model, device, train_loader, optimizer, epoch):
             y_pred_test = np.concatenate((y_pred_test, outputs))
             test_labels = np.concatenate((test_labels, labels.numpy()))
 
-  
+    
     correct = np.sum(test_labels == y_pred_test)
     acc = round(correct / len(y_pred_test) * 100, 2)
-    print(f"{epoch + 1} - train_acc: {acc}%")
+    
     return acc
 
 
@@ -106,10 +103,10 @@ def test(model, device, test_loader):
     model.eval()
     count = 0
 
-    with torch.no_grad():  
+    with torch.no_grad(): 
         for inputs_1, labels in test_loader:
           
-            testinputs0 = torch.rand(1, 12, 11, 11).to(device)
+            testinputs0 = torch.rand(1, 6, 11, 11).to(device)
             testinputs = testinputs0
 
            
@@ -136,13 +133,13 @@ def test(model, device, test_loader):
     
     correct = np.sum(test_labels == y_pred_test)
     acc = round(correct / len(y_pred_test) * 100, 2)
-    print(f"{epoch + 1} - test_acc: {acc}%")
+   
     return acc
 
 
 
-num_classes = 7
-model = CSEA_ViT(12, 5).to(device)
+num_classes = 5
+model = UNet(6, 5).to(device)
 momentum = 0.9
 betas = (0.9, 0.999)
 num_epochs = 200
@@ -161,6 +158,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
 
 
 for epoch in range(num_epochs):
+  
     if epoch % 50 == 0 and epoch != 0:
         lr *= 0.1
         optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
@@ -168,12 +166,12 @@ for epoch in range(num_epochs):
             optimizer=optimizer, T_max=num_epochs - epoch
         )
 
+   
     train_acc = train(model, device, train_loader, optimizer, epoch)
     train_accuracies.append(train_acc)
 
     optimizer.step()
     scheduler.step()
-
 
     test_acc = test(model, device, test_loader)
     test_accuracies.append(test_acc)
@@ -183,15 +181,15 @@ for epoch in range(num_epochs):
         best_acc = test_acc
         torch.save(
             model.state_dict(),
-            f'save model path'
+            f'model_{best_acc}.pth'
         )
 
 print("Finished!")
 
 
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, num_epochs + 1), train_accuracies, label='Training', marker='o', markersize=3)
-plt.plot(range(1, num_epochs + 1), test_accuracies, label='Testing', marker='s', markersize=3)
+plt.plot(range(1, num_epochs + 1), train_accuracies, label='train_acc', marker='o', markersize=3)
+plt.plot(range(1, num_epochs + 1), test_accuracies, label='test_acc', marker='s', markersize=3)
 plt.xlabel('Epochs')
 plt.ylabel('OA (%)')
 plt.title('Learning curve on circular polarization basis')
@@ -199,8 +197,9 @@ plt.legend()
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.tight_layout()
 
+
 plt.savefig(save_path, dpi=300, bbox_inches='tight')
-print(f"finished: {save_path}")
+print(f"{save_path}")
 
 
 plt.show()
